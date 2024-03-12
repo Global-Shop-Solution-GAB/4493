@@ -1,0 +1,469 @@
+Program.Sub.ScreenSU.Start
+Gui.frmPrint..Create
+Gui.frmPrint..Caption("Inventory TAG")
+Gui.frmPrint..Size(3210,3285)
+Gui.frmPrint..MinX(0)
+Gui.frmPrint..MinY(0)
+Gui.frmPrint..Position(0,0)
+Gui.frmPrint..BackColor(-2147483633)
+Gui.frmPrint..MaxButton(False)
+Gui.frmPrint..MinButton(False)
+Gui.frmPrint..MousePointer(0)
+Gui.frmPrint.cmdPrint.Create(Button)
+Gui.frmPrint.cmdPrint.Size(855,375)
+Gui.frmPrint.cmdPrint.Position(105,2220)
+Gui.frmPrint.cmdPrint.Caption("&Print")
+Gui.frmPrint.cmdPrint.Event(Click,LoadData_New)
+Gui.frmPrint.cmdPrint.Enabled(False)
+Gui.frmPrint.lbl1.Create(Label,"No of copies :",True,1215,255,0,75,1680,True,0,"Arial",8,-2147483633,0)
+Gui.frmPrint.ddlPrint.Create(DropDownList)
+Gui.frmPrint.ddlPrint.Size(555,330)
+Gui.frmPrint.ddlPrint.Position(1215,1605)
+Gui.frmPrint.ddlPrint.DefaultValue("1")
+Gui.frmPrint.lbl2.Create(Label,"Part :",True,600,255,0,75,165,True,0,"Arial",8,-2147483633,0)
+Gui.frmPrint.txtPart.Create(TextBox,"",True,2175,300,0,120,375,False,0,"Arial",8,-2147483643,1)
+Gui.frmPrint.cmdBrowse.Create(Button)
+Gui.frmPrint.cmdBrowse.Size(510,330)
+Gui.frmPrint.cmdBrowse.Position(2370,360)
+Gui.frmPrint.cmdBrowse.Caption("^")
+Gui.frmPrint.cmdBrowse.Event(Click,cmdBrowse_Click)
+Gui.frmPrint.lbl3.Create(Label,"Loc",True,600,255,0,75,795,True,0,"Arial",8,-2147483633,0)
+Gui.frmPrint.txtloc.Create(TextBox,"",True,885,300,0,120,1005,False,0,"Arial",8,-2147483643,1)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Variable.Global.iBIRunID.Declare(Long,-1)
+Variable.Global.iBILogID.Declare(Long,-1)
+
+Variable.UDT.uInvTag.Define("DESCR",String,"DESCRIPTION")
+Variable.UDT.uInvTag.Define("PART",String,"PART")
+Variable.UDT.uInvTag.Define("INV_UM",String,"INV_UM")
+Variable.UDT.uInvTag.Define("LOCN",String,"LOCATION")
+Variable.UDT.uInvTag.Define("BIN",String,"BIN")
+Variable.UDT.uInvTag.Define("BIRUNID",Long,"")
+Variable.UDT.uInvTag.Define("QTY_ONHAND",Float,"QTY_ONHAND")
+Variable.UDT.uInvTag.Define("HEAT",String,"HEAT")
+Variable.UDT.uInvTag.Define("LOT",String,"LOT")
+Variable.UDT.uInvTag.Define("SERIAL",String,"SERIAL")
+Variable.UDT.uInvTag.Define("USERID",String,"USERID")
+Variable.uGlobal.uInvTag.Declare("uInvTag")
+
+
+Variable.UDT.uInvTagfinal.Define("DESCR",String,"")
+Variable.UDT.uInvTagfinal.Define("PART",String,"")
+Variable.UDT.uInvTagfinal.Define("INV_UM",String,"")
+Variable.UDT.uInvTagfinal.Define("LOCN",String,"")
+Variable.UDT.uInvTagfinal.Define("BIN",String,"")
+Variable.UDT.uInvTagfinal.Define("BIRUNID",Long,"")
+Variable.UDT.uInvTagfinal.Define("QTY_ONHAND",Float,"")
+Variable.UDT.uInvTagfinal.Define("HEAT",String,"")
+Variable.UDT.uInvTagfinal.Define("LOT",String,"")
+Variable.UDT.uInvTagfinal.Define("SERIAL",String,"")
+Variable.UDT.uInvTagfinal.Define("USERID",String,"")
+Variable.uGlobal.uInvTagfinal.Declare("uInvTagfinal")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.ODBC.Connection!con.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+gui.frmPrint.ddlPrint.AddItem("1")
+gui.frmPrint.ddlPrint.AddItem("2")
+gui.frmPrint.ddlPrint.AddItem("3")
+gui.frmPrint.ddlPrint.AddItem("4")
+gui.frmPrint.ddlPrint.AddItem("5")
+gui.frmPrint.ddlPrint.AddItem("6")
+gui.frmPrint.ddlPrint.AddItem("7")
+gui.frmPrint.ddlPrint.AddItem("8")
+gui.frmPrint.ddlPrint.AddItem("9")
+gui.frmPrint.ddlPrint.AddItem("10")
+
+gui.frmPrint.ddlPrint.Text("1")
+Gui.frmPrint.ddlPrint.SetFocus
+
+
+gui.frmPrint..Show
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4493_InvTag.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+Program.Sub.LoadData1.Start
+F.Intrinsic.Control.SetErrorHandler("LoadData1_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+
+
+
+
+'
+'F.Intrinsic.Debug.InvokeDebugger
+'
+'F.Intrinsic.Debug.Stop
+
+
+V.Local.sSql.Declare(String)
+V.Local.iUB.Declare(Long)
+V.Local.bEnt.Declare(Boolean)
+V.Local.lLabelcount.Declare(Long)
+V.Local.i.Declare(Long)
+V.Local.sRet.Declare(String)
+V.Local.iRet.Declare(Long)
+
+gui.frmPrint..Visible(false)
+Function.Intrinsic.UI.InvokeWaitDialog("Printing in progress please wait ...")
+
+F.ODBC.Connection!con.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+
+V.uGlobal.uInvTagfinal.Redim(0,0)
+
+'Loading data from Y table, as being label being printed from Menu, Selecting all fields as all fields are transferred over from Y table to Z table
+
+F.Global.BI.GetRunID(V.Global.iBIRunID)
+
+F.Global.BI.StartLogging(V.Global.iBIRunID,-1,-1,"",V.Global.iBILogID)
+
+
+
+f.Intrinsic.String.Build("select PART, LOCATION, BIN,DESCRIPTION,UM_INVENTORY as INV_UM,QTY_ONHAND,flag_lot,' ' AS USERID,' ' AS HEAT,' ' AS LOT,' ' AS SERIAL from INVENTORY_MSTR where QTY_ONHAND >0 and  part = '{0}' and location = '{1}' order by PART",v.Screen.frmPrint!txtPart.text,v.Screen.frmPrint!txtloc.text,V.Local.sSql)
+F.ODBC.Connection!con.OpenLocalRecordsetRO("rst",V.Local.sSql)
+f.Intrinsic.Control.If(v.ODBC.con!rst.FieldVal!flag_lot,=,"Y")
+	f.Intrinsic.String.Build("select PART,LOCATION,LOT ,BIN,HEAT,SERIAL_NUMBER as SERIAL,QUANTITY as QTY_ONHAND,USERID,'{0}' as INV_UM,'{1}' as DESCRIPTION from ITEM_MASTER where QUANTITY>0 and  part = '{2}' and location = '{3}' order by PART",v.ODBC.con!rst.FieldVal!INV_UM,v.ODBC.con!rst.FieldVal!DESCRIPTION,v.Screen.frmPrint!txtPart.text,v.Screen.frmPrint!txtloc.text,v.Local.sSql)
+	F.ODBC.con!rst.Close
+	F.ODBC.Connection!con.OpenLocalRecordsetRW("rst",V.Local.sSql)
+f.Intrinsic.Control.Else
+	f.Intrinsic.String.Build("select top 1 userid from v_INVENTORY_HIST as HIST where part = '{0}' and location = '{1}' order by date_history desc,Inv_hist_time desc",v.Screen.frmPrint!txtPart.text,v.Screen.frmPrint!txtloc.text,V.Local.sSql)	
+	V.Local.bEnt.Set(True)
+f.Intrinsic.Control.EndIf 
+F.Intrinsic.Variable.LoadUDTFromRecordset("con","rst","V.uGlobal.uInvTag",False,0)
+
+f.Intrinsic.Control.If(V.Local.bEnt,=,true)
+	F.ODBC.con!rst.Close
+	F.ODBC.Connection!con.OpenLocalRecordsetRO("rst",V.Local.sSql)
+'	Function.Global.Security.GetUserId(v.ODBC.con!rst.FieldValtrim!userid,v.Caller.CompanyCode,V.Local.iRet)
+'	Function.Global.Security.GetUsernameFromID(V.Local.iRet, V.Local.sRet)
+	
+'	f.Intrinsic.Control.If(V.Local.sRet,=,"***NORETURN***")
+'		F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!USERID,v.ODBC.con!rst.FieldVal!userid)
+'	F.Intrinsic.Control.ELSE
+'		f.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+'		F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!USERID,V.Local.sRet(0))
+'	f.Intrinsic.Control.EndIf
+	Function.Global.Security.GetFullName(v.ODBC.con!rst.FieldValtrim!userid,v.Caller.CompanyCode,V.Local.sRet)
+	f.Intrinsic.Control.If(V.Local.sRet.trim,=,"")
+		F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!USERID,v.ODBC.con!rst.FieldVal!userid)
+	F.Intrinsic.Control.ELSE
+		F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!USERID,V.Local.sRet)
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Else
+	F.ODBC.con!rst.MoveFirst
+f.Intrinsic.Control.EndIf
+
+f.Intrinsic.Control.DoUntil(v.ODBC.con!rst.EOF,=,True)
+	Function.Global.Security.GetFullName(v.ODBC.con!rst.FieldValtrim!userid,v.Caller.CompanyCode,V.Local.sRet)
+	f.Intrinsic.Control.If(V.Local.sRet.trim,=,"")
+		V.uGlobal.uInvTag(V.Local.i)!USERID.Set(v.ODBC.con!rst.FieldVal!userid)
+	F.Intrinsic.Control.ELSE
+		V.uGlobal.uInvTag(V.Local.i)!USERID.Set(V.Local.sRet)
+	f.Intrinsic.Control.EndIf
+	f.Intrinsic.Math.Add(V.Local.i,1,V.Local.i)
+	F.ODBC.con!rst.MoveNext 
+f.Intrinsic.Control.Loop 
+	
+F.ODBC.con!rst.Close
+
+F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!BIRUNID,V.Global.iBIRunID)
+
+V.Local.lLabelcount.Set(V.Screen.frmPrint!ddlPrint.Text)
+
+
+
+F.Intrinsic.Control.For(V.Local.i,1,V.Local.lLabelcount,1)
+	Function.Intrinsic.Variable.UDTCopy(V.uGlobal.uInvTag, V.uGlobal.uInvTagfinal, True)
+Function.Intrinsic.Control.Next(V.Local.i)
+
+
+
+
+F.Intrinsic.Variable.UDTFlagOrdinal(V.uGlobal.uInvTagfinal,True,"0")
+F.Intrinsic.Variable.UDTDeleteFlagged(V.uGlobal.uInvTagfinal)
+
+
+F.Intrinsic.Control.If(V.uGlobal.uInvTag.UBound,>,-1)
+    'Checking to see if sequence being printed is Codesoft label
+'    Function.Intrinsic.Control.If(Variable.Global.bSentinel,=,True)
+        'Stopping Logging
+        F.Global.BI.StopLogging(V.Global.iBILogID)
+
+        'Printing Codesoft label
+        F.Global.BI.PrintCodesoftLabelFromUDT(V.Global.iBIRunID,V.Global.iBILogID,"uGlobal.uInvTagfinal","","",True)
+F.Intrinsic.Control.EndIf
+
+Function.Intrinsic.UI.CloseWaitDialog
+
+Function.Intrinsic.Control.CallSub(Unload1)
+
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LoadData1_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4493_InvTag.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.LoadData1.End
+
+Program.Sub.Unload1.Start
+F.Intrinsic.Control.SetErrorHandler("Unload1_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+
+F.ODBC.Connection!con.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Unload1_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4493_InvTag.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Unload1.End
+
+Program.Sub.cmdBrowse_Click.Start
+F.Intrinsic.Control.SetErrorHandler("LoadData1_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+'
+V.Local.sTitles.Declare(String)
+V.Local.sWidths.Declare(String)
+V.Global.sRet.Declare(String)
+V.Local.sSql.Declare(String)
+V.Local.sPart.Declare(String)
+
+v.Local.bRet.declare(Boolean)
+
+Function.Intrinsic.UI.InvokeWaitDialog("Processing ...")
+
+
+'F.Intrinsic.UI.SetBrowserHotTypeAhead(True)
+'F.Intrinsic.UI.Browser(100,"",V.Local.sRet)
+'
+'F.Intrinsic.Control.If(V.Local.sRet,<>,"***CANCEL***")
+'	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+'
+'	F.Intrinsic.String.GSSPartString(V.Local.sRet(0),V.Local.sRet(1),V.Local.sPart)
+'	gui.frmPrint.txtPart.Text(V.Local.sPart)
+'	gui.frmPrint.txtLoc.Text(V.Local.sRet(2))
+'	
+'	f.Intrinsic.Control.If(V.Local.sRet(5),>,0)
+'		gui.frmPrint.cmdPrint.Enabled(true)
+'	f.Intrinsic.Control.Else
+'		gui.frmPrint.cmdPrint.Enabled(false)
+'	f.Intrinsic.Control.endif
+'f.Intrinsic.Control.EndIf 
+
+
+'Variable.Local.sRet.Declare(string)
+'Variable.Local.sTemp.Declare(string)
+'Variable.Local.sTitles.Declare(string)
+'Variable.Local.iWidths.Declare(long)
+'Variable.Local.sSql.Declare(string)
+' 
+'Function.Intrinsic.String.Split("Job*!*Suffix*!*Part*!*Description*!*Customer*!*Due Date","*!*",variable.local.sTitles)
+'Function.Intrinsic.String.Split("1000*!*800*!*2000*!*3000*!*800*!*1000","*!*",variable.local.iWidths)
+'Function.ODBC.Connection!Conx.Openconnection("Global_PLA","Master","master")
+'Function.Intrinsic.UI.Browser("Select a job","conx","Select Job, Suffix, Part, Description, Customer, Date_Due From V_JOB_HEADER",Variable.Local.sTitles,Variable.Local.iWidths,Variable.Local.sRet)
+'Function.Intrinsic.Control.If(Variable.Local.sRet,"=","***CANCEL***")
+' Function.Intrinsic.UI.Msgbox("No job was selected!")
+'Function.Intrinsic.Control.Else
+' Function.Intrinsic.String.Split(Variable.Local.sRet,"*!*",Variable.Local.sRet)
+' Function.Intrinsic.String.Concat("You selected ",Variable.Local.sRet(0),"-",Variable.Local.sRet(1),"  ",Variable.Local.sRet(3),Variable.Local.sTemp)
+' Function.Intrinsic.UI.Msgbox(Variable.Local.sTemp)
+'Function.Intrinsic.Control.EndIf
+
+'------------------------------------
+'
+Variable.Local.sTemp.Declare(string)
+''Variable.Local.sTitles.Declare(string)
+Variable.Local.iWidths.Declare(long)
+
+
+
+'' 
+'Function.Intrinsic.String.Split("Part*!*Description*!*Location*!*Lot*!*Bin*!*Heat*!*SerialNo*!*Userid*!*Qty_OnHand*!*flag","*!*",variable.local.sTitles)
+'Function.Intrinsic.String.Split("1200*!*2000*!*1000*!*1000*!*1000*!*1000*!*1000*!*500*!*600!*10","*!*",variable.local.sWidths)
+
+Function.Intrinsic.String.Split("Part*!*Description*!*Location*!*Lot*!*Bin*!*Heat*!*SerialNo*!*Qty_OnHand*!*Userid*!*flag","*!*",variable.local.sTitles)
+Function.Intrinsic.String.Split("1200*!*2000*!*1000*!*1000*!*1000*!*1000*!*1000*!*600*!*0*!*0","*!*",variable.local.sWidths)
+'
+
+Variable.Local.sSql.Set("(select part,description,location,'' as LOT, BIN,'' as HEAT,'' as SERIAL_NUMBER,Qty_OnHand,'' as userid,'N' as flag from INVENTORY_MSTR  UNION")
+f.Intrinsic.String.Build("{0} select ITM.PART,description, ITM.LOCATION,LOT ,ITM.BIN,HEAT,SERIAL_NUMBER,QUANTITY ,userid,'Y' as flag from INVENTORY_MSTR as INV join ITEM_MASTER as ITM on INV.Part = ITM.Part and INV.location = ITM.location where QUANTITY>0) order by part,Qty_OnHand desc",Variable.Local.sSql,Variable.Local.sSql)
+
+
+'F.Intrinsic.Debug.InvokeDebugger
+'
+'F.Intrinsic.Debug.Stop
+
+'Variable.Local.sSql.Set(" select part,description,location,'' as LOT, BIN,'' as HEAT,'' as SERIAL_NUMBER,Qty_OnHand,'' as userid,'N' as flag from INVENTORY_MSTR where not exists (select * from ITEM_MASTER INV where INV.part = INVENTORY_MSTR.part and INV.location = INVENTORY_MSTR.location) UNION")
+'f.Intrinsic.String.Build("{0} (select ITM.PART,description, ITM.LOCATION,LOT ,ITM.BIN,HEAT,SERIAL_NUMBER,QUANTITY ,userid,'Y' as flag from INVENTORY_MSTR as INV join ITEM_MASTER as ITM on INV.Part = ITM.Part and INV.location = ITM.location where QUANTITY>0) order by part,Qty_OnHand desc",Variable.Local.sSql,Variable.Local.sSql)
+
+Variable.Local.sSql.Set("(select part,description,location,'' as LOT, BIN,'' as HEAT,'' as SERIAL_NUMBER,Qty_OnHand,'' as userid,'N' as flag from INVENTORY_MSTR where flag_lot <> 'Y' UNION")
+f.Intrinsic.String.Build("{0} select ITM.PART,description, ITM.LOCATION,LOT ,ITM.BIN,HEAT,SERIAL_NUMBER,QUANTITY ,userid,'Y' as flag from INVENTORY_MSTR as INV join ITEM_MASTER as ITM on INV.Part = ITM.Part and INV.location = ITM.location where QUANTITY>0) order by part,Qty_OnHand desc",Variable.Local.sSql,Variable.Local.sSql)
+
+F.Intrinsic.UI.SetBrowserHotTypeAhead(True)
+Function.Intrinsic.UI.Browser("Select a part","con",Variable.Local.sSql,Variable.Local.sTitles,Variable.Local.sWidths,18000,11000,Variable.Global.sRet)
+Function.Intrinsic.Control.If(Variable.Global.sRet,"=","***CANCEL***")
+ Function.Intrinsic.UI.Msgbox("No part was selected!")
+Function.Intrinsic.Control.Else
+ Function.Intrinsic.String.Split(Variable.Global.sRet,"*!*",Variable.Global.sRet)
+ gui.frmPrint.txtPart.Text(Variable.Global.sRet(0))
+	gui.frmPrint.txtLoc.Text(Variable.Global.sRet(2))
+'	
+	f.Intrinsic.Control.If(V.Global.sRet(7).Float,>,0)
+		gui.frmPrint.cmdPrint.Enabled(true)
+	f.Intrinsic.Control.Else
+		gui.frmPrint.cmdPrint.Enabled(false)
+	f.Intrinsic.Control.endif
+Function.Intrinsic.Control.EndIf
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LoadData1_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4493_InvTag.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.cmdBrowse_Click.End
+
+Program.Sub.LoadData_New.Start
+F.Intrinsic.Control.SetErrorHandler("LoadData_New_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+
+V.Local.sSql.Declare(String)
+V.Local.iUB.Declare(Long)
+V.Local.bEnt.Declare(Boolean)
+V.Local.lLabelcount.Declare(Long)
+V.Local.i.Declare(Long)
+V.Local.sRet.Declare(String)
+V.Local.iRet.Declare(Long)
+
+gui.frmPrint..Visible(false)
+Function.Intrinsic.UI.InvokeWaitDialog("Printing in progress please wait ...")
+
+
+V.uGlobal.uInvTagfinal.Redim(0,0)
+
+'Loading data from Y table, as being label being printed from Menu, Selecting all fields as all fields are transferred over from Y table to Z table
+
+F.Global.BI.GetRunID(V.Global.iBIRunID)
+
+F.Global.BI.StartLogging(V.Global.iBIRunID,-1,-1,"",V.Global.iBILogID)
+
+
+
+F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!BIRUNID,V.Global.iBIRunID)
+
+V.uGlobal.uInvTag(V.Local.i)!PART.Set(v.Global.sRet(0))
+V.uGlobal.uInvTag(V.Local.i)!DESCR.Set(v.Global.sRet(1))
+V.uGlobal.uInvTag(V.Local.i)!LOCN.Set(v.Global.sRet(2))
+V.uGlobal.uInvTag(V.Local.i)!LOT.Set(v.Global.sRet(3))
+V.uGlobal.uInvTag(V.Local.i)!BIN.Set(v.Global.sRet(4))
+V.uGlobal.uInvTag(V.Local.i)!HEAT.Set(v.Global.sRet(5))
+V.uGlobal.uInvTag(V.Local.i)!SERIAL.Set(v.Global.sRet(6))
+V.uGlobal.uInvTag(V.Local.i)!QTY_ONHAND.Set(v.Global.sRet(7))
+
+
+'F.Intrinsic.Debug.InvokeDebugger
+'
+'F.Intrinsic.Debug.Stop
+
+
+f.Intrinsic.Control.If(v.Global.sRet(8),=,"N")
+	f.Intrinsic.String.Build("select top 1 userid from v_INVENTORY_HIST as HIST where part = '{0}' and location = '{1}' order by date_history desc,Inv_hist_time desc",v.Global.sRet(0),v.Global.sRet(2),V.Local.sSql)	
+	F.ODBC.Connection!con.OpenLocalRecordsetRO("rst",V.Local.sSql)
+	
+	Function.Global.Security.GetFullName(v.ODBC.con!rst.FieldValtrim!userid,v.Caller.CompanyCode,V.Local.sRet)
+	f.Intrinsic.Control.If(V.Local.sRet.trim,=,"")
+		F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!USERID,v.ODBC.con!rst.FieldVal!userid)
+	F.Intrinsic.Control.ELSE
+		F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!USERID,v.Global.sRet(8))
+	f.Intrinsic.Control.EndIf
+	F.ODBC.con!rst.Close
+f.Intrinsic.Control.Else
+	F.Intrinsic.Variable.UDTSetMemberValue(V.uGlobal.uInvTag!USERID,v.Global.sRet(8))
+f.Intrinsic.Control.EndIf 
+
+
+V.Local.lLabelcount.Set(V.Screen.frmPrint!ddlPrint.Text)
+
+F.Intrinsic.Control.For(V.Local.i,1,V.Local.lLabelcount,1)
+	Function.Intrinsic.Variable.UDTCopy(V.uGlobal.uInvTag, V.uGlobal.uInvTagfinal, True)
+Function.Intrinsic.Control.Next(V.Local.i)
+
+
+F.Intrinsic.Variable.UDTFlagOrdinal(V.uGlobal.uInvTagfinal,True,"0")
+F.Intrinsic.Variable.UDTDeleteFlagged(V.uGlobal.uInvTagfinal)
+
+
+F.Intrinsic.Control.If(V.uGlobal.uInvTag.UBound,>,-1)
+    'Checking to see if sequence being printed is Codesoft label
+'    Function.Intrinsic.Control.If(Variable.Global.bSentinel,=,True)
+        'Stopping Logging
+        F.Global.BI.StopLogging(V.Global.iBILogID)
+
+        'Printing Codesoft label
+        F.Global.BI.PrintCodesoftLabelFromUDT(V.Global.iBIRunID,V.Global.iBILogID,"uGlobal.uInvTagfinal","","",True)
+F.Intrinsic.Control.EndIf
+
+Function.Intrinsic.UI.CloseWaitDialog
+
+Function.Intrinsic.Control.CallSub(Unload1)
+
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LoadData_New_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4493_InvTag.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.LoadData_New.End
+
+Program.Sub.Comments.Start
+${$0$}$GCG_4493_InvTag.g2u$}$RAN$}$1/6/2017 10:58:36 AM$}$False
+${$3$}$0$}$$}$0$}$-1$}$$}$12:00:00 AM$}$Print Inventory TAG codesoft Labels
+Program.Sub.Comments.End
+
+Program.Sub.Unload.End
